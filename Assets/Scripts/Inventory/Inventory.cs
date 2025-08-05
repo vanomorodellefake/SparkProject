@@ -27,10 +27,10 @@ public class Inventory : MonoBehaviour
 
     private void OnEnable()
     {
-        inputActions.Player.HotKey.performed += Items[slotIndex].ItemUse;
+        //inputActions.Player.HotKey.performed += Items[slotIndex].ItemUse;
     }
     private void OnDisable()
     {
-        inputActions.Player.HotKey.performed -= Items[slotIndex].ItemUse;
+        //inputActions.Player.HotKey.performed -= Items[slotIndex].ItemUse;
     }
 }

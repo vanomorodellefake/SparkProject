@@ -21,7 +21,7 @@ public class AdvancedRandomList<T>
     {
         MassiveOfObjects = NewMassive;
     }
-
+    /*
     public void LoadFromInterface<U>(U[] items) where U : IItemOfMassive<T>
     {
         MassiveOfObjects = items
@@ -34,7 +34,7 @@ public class AdvancedRandomList<T>
             })
             .ToArray();
     }
-
+    */
     public List<T> ReturnRandomListOfItems(int enter_amount)
     {
         Amount = enter_amount;
@@ -262,18 +262,12 @@ public class AdvancedRandomList<T>
     }
 }
 
+[System.Serializable]
 public class ItemOfMassive<T>
 {
     public string name;
-    public T Value { get; set; }
-    public int weight { get; set; }
-    public int max_amount { get; set; }
-    public int min_amount { get; set; }
-}
-public interface IItemOfMassive<T>
-{
-    T Value { get; }
-    int Weight { get; }
-    int Max_amount { get; }
-    int Min_amount { get; }
+    public T Value;
+    public int weight;
+    public int max_amount;
+    public int min_amount;
 }

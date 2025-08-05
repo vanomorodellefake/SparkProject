@@ -2,7 +2,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DetailsTable", menuName = "Detail")]
 public class Details : ScriptableObject
 {
-    public Column[] details;
+    public ItemOfMassive<Row[]>[] details;
 
 
     /*
@@ -205,22 +205,6 @@ public class Details : ScriptableObject
     }
 
     */
-}
-
-
-
-[System.Serializable]
-public class Column : IItemOfMassive<Row[]>
-{
-    public Row[] Value => columns;
-    public int Weight => weight;
-    public int Max_amount => max_amount;
-    public int Min_amount => min_amount;
-
-    public Row[] columns;
-    public int weight;
-    public int max_amount;
-    public int min_amount;
 }
 
 [System.Serializable]

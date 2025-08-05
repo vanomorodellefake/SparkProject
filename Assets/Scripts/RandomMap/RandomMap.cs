@@ -41,7 +41,7 @@ public class CreateFloor : MonoBehaviour
         // Генерим и распределяем румы
 
         AdvancedRandomList<Row[]> advancedRandomList = new();
-        advancedRandomList.LoadFromInterface(details.details);
+        advancedRandomList.SetAsMassive(details.details);
         List<int[,]> NEWDETAILS_LIST = Defiler(advancedRandomList.ReturnRandomListOfItems(rooms));
 
         for (int i = 1; i <= rooms; i++)
@@ -465,7 +465,7 @@ public class CreateFloor : MonoBehaviour
     {
         Dictionary<int, TypeOfRoom> DistributionDictionary = new();
         AdvancedRandomList<TypeOfRoom> advancedRandomList = new();
-        advancedRandomList.LoadFromInterface(typesOfRoom.typeOfRoomInfs);
+        advancedRandomList.SetAsMassive(typesOfRoom.typeOfRoomInfs);
         List<TypeOfRoom> types = advancedRandomList.ReturnRandomListOfItems(rooms);
         for (int i=1; i<=rooms;i++)
         {
@@ -487,7 +487,7 @@ public class CreateFloor : MonoBehaviour
             int CountOfPlaces = NumOfSquaresInRooms[i]*9;
 
             AdvancedRandomList<ContentsOfType> advancedRandomList1 = new();
-            advancedRandomList1.LoadFromInterface(DistributionDictionary[i].contentOfRoom);
+            advancedRandomList1.SetAsMassive(DistributionDictionary[i].contentOfRoom);
             List<ContentsOfType> ContentTypeList = advancedRandomList1.ReturnRandomListOfItems(CountOfPlaces);
 
             Dictionary<ContentsOfType, int> DiffTypesCount = new();
@@ -503,7 +503,7 @@ public class CreateFloor : MonoBehaviour
             foreach (var qwe in DiffTypesCount)
             {
                 AdvancedRandomList<Object> advancedRandomList2 = new();
-                advancedRandomList2.LoadFromInterface(qwe.Key.contentOfType);
+                advancedRandomList2.SetAsMassive(qwe.Key.contentOfType);
                 List<Object> ContentList = advancedRandomList2.ReturnRandomListOfItems(qwe.Value);
                 TimedContentPlacingList.Add(ContentList);
                 DictToCheck.Add(qwe.Key, k3);
