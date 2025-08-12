@@ -33,5 +33,5 @@ MonoBehaviour:
     Value:
     - cells: 01010101
     weight: 5
-    max_amount: 2
-    min_amount: 2
+    max_amount: 0
+    min_amount: 0

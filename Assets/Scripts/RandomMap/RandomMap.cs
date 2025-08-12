@@ -8,6 +8,7 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 public class CreateFloor : MonoBehaviour
 {
     [SerializeField] private GameObject wall;
+    [SerializeField] private GameObject wallWithHole;
     [SerializeField] private int x;
     [SerializeField] private int y;
     [SerializeField] private int rooms;
@@ -15,6 +16,7 @@ public class CreateFloor : MonoBehaviour
     [SerializeField] private TypesOfRoom typesOfRoom;
 
     private Dictionary<int, int> NumOfSquaresInRooms = new();
+    private (int, int, int) dataLongestShotWay;
 
     private void Start()
     {
@@ -24,6 +26,7 @@ public class CreateFloor : MonoBehaviour
         DebugMap(map);
         GenerateOfPaths(map, rooms);
         GenerateRooms(map);
+        GenerateWalls(map);
         int k2 = 0;
         foreach (var qwe in NumOfSquaresInRooms)
         {
@@ -686,37 +689,64 @@ public class CreateFloor : MonoBehaviour
         {
             for (int j = 0; j < rows; j++)
             {
-                int currentRoom = metrs[j,i];
+                int currentRoom = metrs[j, i];
 
                 // Генерация стен вокруг
-
+                /*
                 if (i == 0)
                 {
-                    Instantiate(wall, new Vector3(i - 0.5f, 0, j), Quaternion.identity, transform);
+                    Instantiate(wall, new Vector3(i*5 - 0.5f, 0, j*5), Quaternion.identity, transform);
                 }
                 if (i == x-1)
                 {
-                    Instantiate(wall, new Vector3(i + 0.5f, 0, j), Quaternion.identity, transform);
+                    Instantiate(wall, new Vector3(i * 5 + 0.5f, 0, j * 5), Quaternion.identity, transform);
                 }
                 if (j == 0)
                 {
-                    Instantiate(wall, new Vector3(i, 0, j - 0.5f), Quaternion.Euler(0, 90, 0), transform);
+                    Instantiate(wall, new Vector3(i * 5, 0, j*5 - 0.5f), Quaternion.Euler(0, 90, 0), transform);
                 }
                 if (j == y-1)
                 {
-                    Instantiate(wall, new Vector3(i, 0, j + 0.5f), Quaternion.Euler(0, 90, 0), transform);
+                    Instantiate(wall, new Vector3(i * 5, 0, j * 5 + 0.5f), Quaternion.Euler(0, 90, 0), transform);
                 }
-
+                */
                 // Генерация стен между комнат
-                if (i < x - 1 && metrs[j,i+1] != currentRoom)
+                if (currentRoom != 0)
                 {
-                    Instantiate(wall, new Vector3(i + 0.5f, 0, j), Quaternion.identity, transform);
+                    if ( ( i < x - 1 && metrs[j, i + 1] == 0 ) || i == x - 1)
+                    {
+                        Instantiate(wall, new Vector3(i * 5 + 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                    }
+                    else if (metrs[j, i + 1] != currentRoom)
+                    {
+                        Instantiate(wallWithHole, new Vector3(i * 5 + 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                    }
+                    if ((i > 0 && metrs[j, i - 1] == 0) || i == 0)
+                    {
+                        Instantiate(wall, new Vector3(i * 5 - 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                    }
+                    else if (metrs[j, i - 1] != currentRoom)
+                    {
+                        Instantiate(wallWithHole, new Vector3(i * 5 - 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                    }
+                    if (j < y - 1 && metrs[j + 1, i] == 0 || j == y - 1)
+                    {
+                        Instantiate(wall, new Vector3(i*5, 2.5f, j*5 + 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                    }
+                    else if (metrs[j + 1, i] != currentRoom)
+                    {
+                        Instantiate(wallWithHole, new Vector3(i * 5, 2.5f, j * 5 + 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                    }
+                    if (j > 0 && metrs[j - 1, i] == 0 || j == 0)
+                    {
+                        Instantiate(wall, new Vector3(i * 5, 2.5f, j * 5 - 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                    }
+                    else if (metrs[j - 1, i] != currentRoom)
+                    {
+                        Instantiate(wallWithHole, new Vector3(i * 5, 2.5f, j * 5 - 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                    }
                 }
-
-                if (j < y - 1 && metrs[j+1,i] != currentRoom)
-                {
-                    Instantiate(wall, new Vector3(i, 0, j + 0.5f), Quaternion.Euler(0, 90, 0), transform);
-                }
+                
             }
         }
     }
@@ -766,7 +796,7 @@ public class CreateFloor : MonoBehaviour
                 }
             }
         }
-        graph = floid.floid(graph);
+        dataLongestShotWay = floid.floid(graph);
 
         foreach (var qwe in graph)
         {
@@ -777,6 +807,7 @@ public class CreateFloor : MonoBehaviour
                 Debug.Log($"{qwe2.Key.Name} - {qwe2.Value}");
             }
         }
+        Debug.Log($"{dataLongestShotWay.Item1} {dataLongestShotWay.Item2} {dataLongestShotWay.Item3}");
         //Debug.Log($"rows: {rows}, cols: {cols}");
         /*
         var dictOfPaths = new Dictionary<int, List<int>>();

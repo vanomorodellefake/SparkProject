@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 public class Floid
@@ -42,7 +43,7 @@ public class Floid
         return -1;
     }
 
-    public Graph floid(Graph graph)
+    public (int, int, int) floid(Graph graph)
     {
         Graph altgraph = graph;
 
@@ -69,6 +70,22 @@ public class Floid
                 }
             }
         }
-        return altgraph;
+        int maxLenght = -1;
+        string currentNode = "";
+        string endNode = "";
+        foreach (var i in altgraph)
+        {
+            foreach (var j in i.Links)
+            {
+                if (maxLenght < j.Value)
+                {
+                    maxLenght = j.Value;
+                    currentNode = i.Name;
+                    endNode = j.Key.Name;
+                }
+                maxLenght = Math.Max(maxLenght, j.Value);
+            }
+        }
+        return (maxLenght, Int32.Parse(currentNode), Int32.Parse(endNode));
     }
 }
