@@ -13,28 +13,25 @@ MonoBehaviour:
   m_Name: DetailsTable
   m_EditorClassIdentifier: 
   details:
-  - columns:
-    - cells: 000100
-    - cells: 010101
+  - name: 1+2+1
+    Value:
+    - cells: 0100
+    - cells: 0101
+    - cells: 0100
     weight: 5
-    max_amount: 2
-    min_amount: 2
-  - columns:
+    max_amount: 0
+    min_amount: 0
+  - name: 2+1+1
+    Value:
     - cells: 0101
     - cells: 0100
     - cells: 0100
     weight: 5
-    max_amount: 2
-    min_amount: 2
-  - columns:
+    max_amount: 0
+    min_amount: 0
+  - name: 4
+    Value:
     - cells: 01010101
-    weight: 5
-    max_amount: 2
-    min_amount: 2
-  - columns:
-    - cells: 010101
-    - cells: 010101
-    - cells: 010101
     weight: 5
     max_amount: 2
     min_amount: 2

@@ -68,16 +68,16 @@ public class AdvancedRandomList<T>
             List<T> ITOG_LIST_DETAILS = new List<T>();
             while (checker <= Amount)
             {
-                Debug.Log("Начинаю попытку получения комнаты");
+                //Debug.Log("Начинаю попытку получения комнаты");
                 ItemOfMassive<T> detail = TryGetRoom(details_copy, checker);
                 
                 
                 ///////////////////////////////////////////////////////////////////////
 
-                if (detail == null)
-                    Debug.Log("ПУСТАЯ ДЕТАЛЬ");
-                else
-                    Debug.Log($"Получена деталь с весом {detail.weight}");
+                //if (detail == null)
+                //    Debug.Log("ПУСТАЯ ДЕТАЛЬ");
+                //else
+                //    Debug.Log($"Получена деталь с весом {detail.weight}");
 
                 ///////////////////////////////////////////////////////////////////////
 

@@ -13,24 +13,26 @@ MonoBehaviour:
   m_Name: TypeOfRoomsTable
   m_EditorClassIdentifier: 
   typeOfRoomInfs:
-  - typeOfRoom:
-      name: StartRoom
-      floor: {fileID: 3948585843614885518, guid: 134fae980e292c644893f445cf02d537, type: 3}
+  - name: 1room
+    Value:
+      floorsOfRoom: {fileID: 11400000, guid: 5bce08bbd477a244fb5fae383bac95ca, type: 2}
+      wallsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
       contentOfRoom:
-      - name: "\u0414\u0415\u041A\u041E\u0420"
-        content: {fileID: 11400000, guid: d642de61fc851ba478ab0fc8ab910e8e, type: 2}
-        weight: 1
+      - name: empty
+        Value: {fileID: 11400000, guid: d642de61fc851ba478ab0fc8ab910e8e, type: 2}
+        weight: 5
         max_amount: 0
         min_amount: 0
     weight: 5
-    max_amount: 0
-    min_amount: 0
-  - typeOfRoom:
-      name: Kitchen
-      floor: {fileID: 682977203907855196, guid: a1f165c2c1d40634cbaef0653c3c2652, type: 3}
+    max_amount: 1
+    min_amount: 1
+  - name: 2room
+    Value:
+      floorsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
+      wallsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
       contentOfRoom:
-      - name: decoration
-        content: {fileID: 11400000, guid: 2f331161a5421654bba600626ee6a5ec, type: 2}
+      - name: noempty
+        Value: {fileID: 11400000, guid: 2f331161a5421654bba600626ee6a5ec, type: 2}
         weight: 5
         max_amount: 0
         min_amount: 0

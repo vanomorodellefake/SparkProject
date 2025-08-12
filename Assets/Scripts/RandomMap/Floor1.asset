@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f132b3b9e4965b14f89fd56bff5f834e, type: 3}
-  m_Name: "\u0445\u0438\u043B\u043A\u0438"
+  m_Name: Floor1
   m_EditorClassIdentifier: 
   contentOfType:
-  - name: "\u0441\u0441"
-    Value: {fileID: 5462756827682448777, guid: a6d6a527dea21cc4e8d13f6e41a36087, type: 3}
-    weight: 1
+  - name: floor
+    Value: {fileID: 3948585843614885518, guid: 134fae980e292c644893f445cf02d537, type: 3}
+    weight: 5
     max_amount: 0
     min_amount: 0

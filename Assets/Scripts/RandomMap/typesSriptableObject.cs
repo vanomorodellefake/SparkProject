@@ -7,7 +7,8 @@ public class TypesOfRoom : ScriptableObject
 [System.Serializable]
 public class TypeOfRoom
 {
-    public string name;
-    public GameObject floor;
+    //public GameObject floor;
+    public ContentsOfType floorsOfRoom;
+    public ContentsOfType wallsOfRoom;
     public ItemOfMassive<ContentsOfType>[] contentOfRoom;
 }

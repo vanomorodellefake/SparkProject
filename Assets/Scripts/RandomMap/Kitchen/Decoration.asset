@@ -14,27 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentOfType:
   - name: Capsule
-    gameObject: {fileID: 7364870129941274175, guid: 978bb8657d15e8e4989a3a8967ba9e19, type: 3}
+    Value: {fileID: 7364870129941274175, guid: 978bb8657d15e8e4989a3a8967ba9e19, type: 3}
     weight: 5
     max_amount: 0
     min_amount: 0
   - name: Colon
-    gameObject: {fileID: 8552149737364585965, guid: cc277e9c3c4f95144b2527154b0401e9, type: 3}
+    Value: {fileID: 8552149737364585965, guid: cc277e9c3c4f95144b2527154b0401e9, type: 3}
     weight: 5
     max_amount: 0
     min_amount: 0
   - name: Cube
-    gameObject: {fileID: 6511476380463444667, guid: f7d2f9ec4e5077a409debc7c11e3d231, type: 3}
+    Value: {fileID: 6511476380463444667, guid: f7d2f9ec4e5077a409debc7c11e3d231, type: 3}
     weight: 5
     max_amount: 0
     min_amount: 0
   - name: Cylinder
-    gameObject: {fileID: 4431626874726064554, guid: 3faaefe59631ff045b3ac88ca77a6aef, type: 3}
+    Value: {fileID: 4431626874726064554, guid: 3faaefe59631ff045b3ac88ca77a6aef, type: 3}
     weight: 5
-    max_amount: 0
-    min_amount: 0
+    max_amount: 1
+    min_amount: 1
   - name: Sphere
-    gameObject: {fileID: 5462756827682448777, guid: a6d6a527dea21cc4e8d13f6e41a36087, type: 3}
+    Value: {fileID: 5462756827682448777, guid: a6d6a527dea21cc4e8d13f6e41a36087, type: 3}
     weight: 5
     max_amount: 0
     min_amount: 0

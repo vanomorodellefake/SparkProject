@@ -13,7 +13,6 @@ public class CreateFloor : MonoBehaviour
     [SerializeField] private int rooms;
     [SerializeField] private Details details;
     [SerializeField] private TypesOfRoom typesOfRoom;
-    [SerializeField] private GameObject floor;
 
     private Dictionary<int, int> NumOfSquaresInRooms = new();
 
@@ -23,6 +22,7 @@ public class CreateFloor : MonoBehaviour
         //CreationOfRooms();
         int[,] map = GenerateMap(rooms);
         DebugMap(map);
+        GenerateOfPaths(map, rooms);
         GenerateRooms(map);
         int k2 = 0;
         foreach (var qwe in NumOfSquaresInRooms)
@@ -414,8 +414,15 @@ public class CreateFloor : MonoBehaviour
     private void GenerateRooms(int[,] map)
     {
         Dictionary<int, TypeOfRoom> DistributionDictionary = DistributionOfRooms(rooms);
-        List<List<Object>> ContentPlacingList = CreateContentOfRooms(rooms, DistributionDictionary);
-        int[] counter = new int[ContentPlacingList.Count];  
+
+        List<List<GameObject>> ContentPlacingList = CreateContentOfRooms(rooms, DistributionDictionary);
+        List<List<GameObject>> floorsPlacingList = CreateFloorsContentOfRooms(rooms, DistributionDictionary);
+        List<List<GameObject>> wallsPlacingList = CreateWallsContentOfRooms(rooms, DistributionDictionary);
+
+        int[] counterContent = new int[ContentPlacingList.Count];
+        int[] counterFloors = new int[floorsPlacingList.Count];
+        int[] counterWalls = new int[wallsPlacingList.Count];
+
         foreach (var content in ContentPlacingList)
         {
             string text = "";
@@ -441,15 +448,17 @@ public class CreateFloor : MonoBehaviour
 
                 if (currentPlace != 0)
                 {
-                    var txt = DistributionDictionary[currentPlace].floor.GetComponentInChildren<TMP_Text>();
+                    var txt = floorsPlacingList[currentPlace-1][counterFloors[currentPlace-1]].GetComponentInChildren<TMP_Text>();
                     txt.text = currentPlace.ToString();
-                    Instantiate(DistributionDictionary[currentPlace].floor, new Vector3(j * 5, 0, i * 5), Quaternion.Euler(0, 0, 0), transform);
+                    Instantiate(floorsPlacingList[currentPlace - 1][counterFloors[currentPlace - 1]], new Vector3(j * 5, 0, i * 5), Quaternion.Euler(0, 0, 0), transform);
+                    counterFloors[currentPlace - 1]++;
+
                     for (int x=-1; x<2; x++)
                     {
                         for (int y=-1; y<2;y++)
                         {
-                            Instantiate(ContentPlacingList[currentPlace - 1][counter[currentPlace - 1]], new Vector3(j * 5 + x*1.5f, 2, i * 5 + y*1.5f), Quaternion.Euler(0, 0, 0), transform);
-                            counter[currentPlace - 1]++;
+                            Instantiate(ContentPlacingList[currentPlace - 1][counterContent[currentPlace - 1]], new Vector3(j * 5 + x*1.5f, -10, i * 5 + y*1.5f), Quaternion.Euler(0, 0, 0), transform);
+                            counterContent[currentPlace - 1]++;
                         }
                     }
                     
@@ -473,17 +482,104 @@ public class CreateFloor : MonoBehaviour
         }
         return DistributionDictionary;
     }
-
-    private List<List<Object>> CreateContentOfRooms(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
+    private List<List<GameObject>> CreateContentOfRooms(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
     {
-        List<List<Object>> ContentPlacingList = new();
+        var allRoomsContent = new List<List<GameObject>>();
+
+        for (int roomNumber = 1; roomNumber <= rooms; roomNumber++)
+        {
+            var currentRoomType = DistributionDictionary[roomNumber];
+            int currentSquaresCount = NumOfSquaresInRooms[roomNumber];
+            int currentPositionsCount = currentSquaresCount * 9;
+
+            // CONTENT
+
+            List<ContentsOfType> contentTypesDistribution = GenerateContentTypesDistribution(currentRoomType.contentOfRoom, currentPositionsCount);
+            List<GameObject> roomContent = GenerateContentObjects(contentTypesDistribution);
+
+            allRoomsContent.Add(roomContent);
+        }
+
+        return allRoomsContent;
+    }
+
+    private List<List<GameObject>> CreateFloorsContentOfRooms(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
+    {
+        var floorsContent = new List<List<GameObject>>();
+
+        for (int roomNumber = 1; roomNumber <= rooms; roomNumber++)
+        {
+            var currentRoomType = DistributionDictionary[roomNumber];
+            int currentSquaresCount = NumOfSquaresInRooms[roomNumber];
+
+            List<GameObject> contentFloors = CreateContentPool(currentRoomType.floorsOfRoom, currentSquaresCount);
+
+            floorsContent.Add(contentFloors);
+        }
+
+        return floorsContent;
+    }
+
+    private List<List<GameObject>> CreateWallsContentOfRooms(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
+    {
+        var wallsContent = new List<List<GameObject>>();
+
+        for (int roomNumber = 1; roomNumber <= rooms; roomNumber++)
+        {
+            var currentRoomType = DistributionDictionary[roomNumber];
+            int currentSquaresCount = NumOfSquaresInRooms[roomNumber];
+
+            List<GameObject> contentWalls = CreateContentPool(currentRoomType.wallsOfRoom, currentSquaresCount);
+
+            wallsContent.Add(contentWalls);
+        }
+
+        return wallsContent;
+    }
+
+    private List<ContentsOfType> GenerateContentTypesDistribution(ItemOfMassive<ContentsOfType>[] contentOfRoom, int currentPositionsCount)
+    {
+        var randomizer = new AdvancedRandomList<ContentsOfType>();
+        randomizer.SetAsMassive(contentOfRoom);
+        return randomizer.ReturnRandomListOfItems(currentPositionsCount);
+    }
+    private List<GameObject> GenerateContentObjects(List<ContentsOfType> contentTypesDistribution)
+    {
+        var diffTypesCount = contentTypesDistribution.GroupBy(type => type).ToDictionary(group => group.Key, group => group.Count());
+        var contentGroups = contentTypesDistribution.GroupBy(type => type).ToDictionary(group => group.Key, group => new { Count = group.Count(), ContentPool = CreateContentPoolWithDynamicAmount(group.Key, diffTypesCount) });
+        var result = new List<GameObject>();
+        foreach (var contentType in contentTypesDistribution)
+        {
+            var pool = contentGroups[contentType].ContentPool;
+            result.Add(pool[0]);
+            pool.RemoveAt(0);
+        }
+        return result;
+    }
+    private List<GameObject> CreateContentPoolWithDynamicAmount(ContentsOfType contentsOfType, Dictionary<ContentsOfType, int> diffTypesCount)
+    {
+        var randomizer = new AdvancedRandomList<GameObject>();
+        randomizer.SetAsMassive(contentsOfType.contentOfType);
+        return randomizer.ReturnRandomListOfItems(diffTypesCount[contentsOfType]);
+    }
+    private List<GameObject> CreateContentPool(ContentsOfType contentsOfType, int amount)
+    {
+        var randomizer = new AdvancedRandomList<GameObject>();
+        randomizer.SetAsMassive(contentsOfType.contentOfType);
+        return randomizer.ReturnRandomListOfItems(amount);
+    }
+    private List<List<GameObject>> CreateContentOfRooms2(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
+    {
+        List<List<GameObject>> ContentPlacingList = new();
+        List<List<GameObject>> ContentFloots = new();
         
         for (int i = 1; i <= rooms; i++)
         {
-            List<List<Object>> TimedContentPlacingList = new();
-            List<Object> TimedContentPlacingList2 = new();
+            List<List<GameObject>> TimedContentPlacingList = new();
+            List<GameObject> TimedContentPlacingList2 = new();
             Dictionary<ContentsOfType, int> DictToCheck = new();
 
+            int CountOfFloors = NumOfSquaresInRooms[i];
             int CountOfPlaces = NumOfSquaresInRooms[i]*9;
 
             AdvancedRandomList<ContentsOfType> advancedRandomList1 = new();
@@ -502,9 +598,9 @@ public class CreateFloor : MonoBehaviour
             int k3 = 0;
             foreach (var qwe in DiffTypesCount)
             {
-                AdvancedRandomList<Object> advancedRandomList2 = new();
+                AdvancedRandomList<GameObject> advancedRandomList2 = new();
                 advancedRandomList2.SetAsMassive(qwe.Key.contentOfType);
-                List<Object> ContentList = advancedRandomList2.ReturnRandomListOfItems(qwe.Value);
+                List<GameObject> ContentList = advancedRandomList2.ReturnRandomListOfItems(qwe.Value);
                 TimedContentPlacingList.Add(ContentList);
                 DictToCheck.Add(qwe.Key, k3);
                 k3++;
@@ -562,5 +658,141 @@ public class CreateFloor : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void GenerateOfPaths(int[,] map, int amountOfRooms)
+    {
+        Floid floid = new Floid();
+        Graph graph = new Graph();
+
+        int rows = map.GetLength(1); // x
+        int cols = map.GetLength(0); // y
+
+        for (int roomNumber = 1; roomNumber <= amountOfRooms; roomNumber++)
+        {
+            graph.AddNode(roomNumber.ToString());
+        }
+
+        for (int i = 0; i < cols - 1; i++)
+        {
+            for (int j = 0; j < rows - 1; j++)
+            {
+                Debug.Log($"i: {i}, j: {j}");
+                int currentRoom = map[i, j];
+                if (currentRoom != 0)
+                {
+                    Node currentNode = graph.Search(currentRoom.ToString());
+                    if (map[i + 1, j] != 0 && map[i + 1, j] != currentRoom)
+                    {
+                        int newRoom = map[i + 1, j];
+                        Node newNode = graph.Search(newRoom.ToString());
+                        if (!currentNode.Links.ContainsKey(newNode))
+                        {
+                            currentNode.Links.Add(newNode, 1);
+                            newNode.Links.Add(currentNode, 1);
+                        }
+                    }
+                    if (map[i, j + 1] != 0 && map[i, j + 1] != currentRoom)
+                    {
+                        int newRoom = map[i, j + 1];
+                        Node newNode = graph.Search(newRoom.ToString());
+                        if (!currentNode.Links.ContainsKey(newNode))
+                        {
+                            currentNode.Links.Add(newNode, 1);
+                            newNode.Links.Add(currentNode, 1);
+                        }
+                    }
+                }
+            }
+        }
+        graph = floid.floid(graph);
+
+        foreach (var qwe in graph)
+        {
+            var qwe1 = graph.ReturnRoads(qwe.Name);
+            Debug.Log(qwe.Name);
+            foreach (var qwe2 in qwe1)
+            {
+                Debug.Log($"{qwe2.Key.Name} - {qwe2.Value}");
+            }
+        }
+        //Debug.Log($"rows: {rows}, cols: {cols}");
+        /*
+        var dictOfPaths = new Dictionary<int, List<int>>();
+        
+        for (int i = 0; i < cols-1; i++)
+        {
+            for (int j = 0; j < rows-1; j++)
+            {
+                Debug.Log($"i: {i}, j: {j}");
+                int currentRoom = map[i,j];
+                if (currentRoom != 0)
+                {
+                    if (!dictOfPaths.ContainsKey(currentRoom))
+                    {
+                        dictOfPaths.Add(currentRoom, new List<int>());
+                    }
+
+                    if (map[i + 1,j] != 0 && map[i + 1,j] != currentRoom)
+                    {
+                        int newRoom = map[i + 1,j];
+                        if (!dictOfPaths[currentRoom].Contains(newRoom))
+                        {
+                            dictOfPaths[currentRoom].Add(newRoom);
+                            if (!dictOfPaths.ContainsKey(newRoom))
+                            {
+                                dictOfPaths.Add(newRoom, new List<int>());
+                            }
+                            dictOfPaths[newRoom].Add(currentRoom);
+                        }
+                    }
+                    if (map[i, j + 1] != 0 && map[i, j + 1] != currentRoom)
+                    {
+                        int newRoom = map[i, j + 1];
+                        if (!dictOfPaths[currentRoom].Contains(newRoom))
+                        {
+                            dictOfPaths[currentRoom].Add(newRoom);
+                            if (!dictOfPaths.ContainsKey(newRoom))
+                            {
+                                dictOfPaths.Add(newRoom, new List<int>());
+                            }
+                            dictOfPaths[newRoom].Add(currentRoom);
+                        }
+                    }
+                }
+            }
+        }
+
+        Debug.Log("PATHS!");
+
+        foreach (var qwe in dictOfPaths)
+        {
+            string text = $"{qwe.Key}: ";
+            for (int i = 0; i < qwe.Value.Count; i++)
+            {
+                //text += i;
+                //text += " ";
+                text += qwe.Value[i];
+                text += " ";
+            }
+
+            Debug.Log(text);
+        }    
+        int amountOfDoorsPerRoom = 1;
+
+        var dictOfPathsWithValues = new Dictionary<int, List<int[]>>();
+
+        foreach (var qwe in dictOfPaths)
+        {
+            int currentRoom = qwe.Key;
+            dictOfPathsWithValues.Add(currentRoom, new List<int[]>());
+
+            foreach (int i in qwe.Value)
+            {
+                dictOfPathsWithValues[currentRoom].Add(new int[2] { i, 1 });
+            }
+
+        }
+        */
     }
 }
