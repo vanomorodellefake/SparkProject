@@ -150,6 +150,11 @@ public class CreateFloor : MonoBehaviour
             Debug.Log("Карта!");
             DebugMap(map);
 
+            if (i == 1)
+            {
+                zenok = true;
+            }
+
             var shag = FallsShags(RoomsCoords, map);
             Debug.Log($"Был найден шаг вниз, равный: {shag}");
             if (shag>0)
@@ -183,26 +188,82 @@ public class CreateFloor : MonoBehaviour
                     zenok = true;
                 }
             }
-
+            
             if (WhereAreWeGoing == 1)
             {
                 if (CanGoLeft)
                     GoLeft(map, RoomsCoords, i);
+                else if (!CheckRoomsAround(RoomsCoords, map))
+                {
+                    WhereAreWeGoing = 2;
+                }
                 else zenok = true;
             }
             else if (WhereAreWeGoing == 2)
             {
                 if (CanGoRight)
                     GoRight(map, RoomsCoords, i);
+                else if (!CheckRoomsAround(RoomsCoords, map))
+                {
+                    WhereAreWeGoing = 1;
+                }
                 else zenok = true;
             }
 
             spawned = true;
         }
-
+        //Debug.LogError(CheckRoomsAround(RoomsCoords, map));
         return map;
     }
-    
+    public bool CheckRoomsAround(List<int[]> RoomCoords, int[,] map)
+    {
+        int roomId = map[RoomCoords[0][0], RoomCoords[0][1]]; // [0][0] y [0][1] x
+        int[] zapretMassive = new int[2] { 0, roomId };
+        int y = map.GetLength(0)-1;
+        int x = map.GetLength(1)-1;
+
+        //Debug.LogError("Размер мапы");
+        //Debug.LogError($"x: {x} y: {y}, roomId: {roomId}, RoomCoords[0][0]: {RoomCoords[0][0]}, RoomCoords[0][1]: {RoomCoords[0][1]}, RoomCoords[1][0]: {RoomCoords[1][0]}, RoomCoords[1][1]: {RoomCoords[1][1]}");
+        //Debug.LogError($"{zapretMassive[0]}, {zapretMassive[1]}");
+
+        foreach (int[] CoordOfRoom in RoomCoords)
+        {
+            Debug.LogWarning($"{CoordOfRoom[0]} {CoordOfRoom[1]}");
+            if (CoordOfRoom[0] != 0) 
+            {
+                if (!zapretMassive.Contains(map[CoordOfRoom[0] - 1, CoordOfRoom[1]]))
+                {
+                    //Debug.LogWarning(map[CoordOfRoom[0] - 1, CoordOfRoom[1]]);
+                    return true;
+                }
+            }
+            if (CoordOfRoom[0] != y)
+            {
+                if (!zapretMassive.Contains(map[CoordOfRoom[0] + 1, CoordOfRoom[1]]))
+                {
+                    //Debug.LogWarning(map[CoordOfRoom[0] + 1, CoordOfRoom[1]]);
+                    return true;
+                }
+            }
+            if (CoordOfRoom[1] != 0)
+            {
+                if (!zapretMassive.Contains(map[CoordOfRoom[0], CoordOfRoom[1] - 1]))
+                {
+                    //Debug.LogWarning(map[CoordOfRoom[0], CoordOfRoom[1] - 1]);
+                    return true;
+                }
+            }
+            if (CoordOfRoom[1] != x)
+            {
+                if (!zapretMassive.Contains(map[CoordOfRoom[0], CoordOfRoom[1] + 1]))
+                {
+                    //Debug.LogWarning(map[CoordOfRoom[0], CoordOfRoom[1] + 1]);
+                    return true;
+                }
+            }         
+        }
+        return false;
+    }
     private bool CheckCanGoLeft(List<int[]> RoomCoords, int[,] map)
     {
         Dictionary<int, int> leftface = new Dictionary<int, int>();
