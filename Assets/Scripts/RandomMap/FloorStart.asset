@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f132b3b9e4965b14f89fd56bff5f834e, type: 3}
-  m_Name: Floor2
+  m_Name: FloorStart
   m_EditorClassIdentifier: 
   contentOfType:
-  - name: floor2
-    Value: {fileID: 682977203907855196, guid: a1f165c2c1d40634cbaef0653c3c2652, type: 3}
+  - name: FloorStart
+    Value: {fileID: 676287845914360007, guid: 7c76dec23afaf9b4a914b033e05fcada, type: 3}
     weight: 5
     max_amount: 0
     min_amount: 0

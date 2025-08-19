@@ -14,9 +14,13 @@ public class CreateFloor : MonoBehaviour
     [SerializeField] private int rooms;
     [SerializeField] private Details details;
     [SerializeField] private TypesOfRoom typesOfRoom;
+    [SerializeField] private bool EnableStartEndRooms;
 
     private Dictionary<int, int> NumOfSquaresInRooms = new();
     private (int, int, int) dataLongestShotWay;
+    private Dictionary<int, Dictionary<int, int>> numberOfPossibleDoors = new();
+    private Dictionary<int, Dictionary<int, int>> numberOfActualDoors = new();
+    private Dictionary<int, List<(int, int, int, int, bool)[]>> coordsOfPossibleDoors = new();
 
     private void Start()
     {
@@ -539,11 +543,36 @@ public class CreateFloor : MonoBehaviour
         Dictionary<int, TypeOfRoom> DistributionDictionary = new();
         AdvancedRandomList<TypeOfRoom> advancedRandomList = new();
         advancedRandomList.SetAsMassive(typesOfRoom.typeOfRoomInfs);
-        List<TypeOfRoom> types = advancedRandomList.ReturnRandomListOfItems(rooms);
-        for (int i=1; i<=rooms;i++)
+        if (!EnableStartEndRooms)
         {
-            DistributionDictionary.Add(i, types[i-1]);
+            List<TypeOfRoom> types = advancedRandomList.ReturnRandomListOfItems(rooms);
+            for (int i = 1; i <= rooms; i++)
+            {
+                DistributionDictionary.Add(i, types[i - 1]);
+            }
         }
+        else
+        {
+            DistributionDictionary.Add(dataLongestShotWay.Item2, typesOfRoom.startRoom);
+            DistributionDictionary.Add(dataLongestShotWay.Item3, typesOfRoom.endRoom);
+            List<TypeOfRoom> types = advancedRandomList.ReturnRandomListOfItems(rooms-2);
+            int i= 1;
+            int i2 = 0;
+            while (i<=rooms)
+            {
+                if (!DistributionDictionary.ContainsKey(i))
+                {
+                    DistributionDictionary.Add(i, types[i2]);
+                    i++;
+                    i2++;
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+
         return DistributionDictionary;
     }
     private List<List<GameObject>> CreateContentOfRooms(int rooms, Dictionary<int, TypeOfRoom> DistributionDictionary)
@@ -715,35 +744,35 @@ public class CreateFloor : MonoBehaviour
                 {
                     if ( ( i < x - 1 && metrs[j, i + 1] == 0 ) || i == x - 1)
                     {
-                        Instantiate(wall, new Vector3(i * 5 + 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                        Instantiate(wall, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
                     }
                     else if (metrs[j, i + 1] != currentRoom)
                     {
-                        Instantiate(wallWithHole, new Vector3(i * 5 + 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                        Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
                     }
                     if ((i > 0 && metrs[j, i - 1] == 0) || i == 0)
                     {
-                        Instantiate(wall, new Vector3(i * 5 - 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                        Instantiate(wall, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
                     }
                     else if (metrs[j, i - 1] != currentRoom)
                     {
-                        Instantiate(wallWithHole, new Vector3(i * 5 - 2.5f, 2.5f, j * 5), Quaternion.identity, transform);
+                        Instantiate(wallWithHole, new Vector3(i * 5 - 2.25f, 2.55f, j * 5), Quaternion.identity, transform);
                     }
                     if (j < y - 1 && metrs[j + 1, i] == 0 || j == y - 1)
                     {
-                        Instantiate(wall, new Vector3(i*5, 2.5f, j*5 + 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                        Instantiate(wall, new Vector3(i*5, 2.75f, j*5 + 2.25f), Quaternion.Euler(0, 90, 0), transform);
                     }
                     else if (metrs[j + 1, i] != currentRoom)
                     {
-                        Instantiate(wallWithHole, new Vector3(i * 5, 2.5f, j * 5 + 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                        Instantiate(wallWithHole, new Vector3(i * 5, 2.75f, j * 5 + 2.25f), Quaternion.Euler(0, 90, 0), transform);
                     }
                     if (j > 0 && metrs[j - 1, i] == 0 || j == 0)
                     {
-                        Instantiate(wall, new Vector3(i * 5, 2.5f, j * 5 - 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                        Instantiate(wall, new Vector3(i * 5, 2.75f, j * 5 - 2.25f), Quaternion.Euler(0, 90, 0), transform);
                     }
                     else if (metrs[j - 1, i] != currentRoom)
                     {
-                        Instantiate(wallWithHole, new Vector3(i * 5, 2.5f, j * 5 - 2.5f), Quaternion.Euler(0, 90, 0), transform);
+                        Instantiate(wallWithHole, new Vector3(i * 5, 2.75f, j * 5 - 2.25f), Quaternion.Euler(0, 90, 0), transform);
                     }
                 }
                 
@@ -776,6 +805,11 @@ public class CreateFloor : MonoBehaviour
                     if (map[i + 1, j] != 0 && map[i + 1, j] != currentRoom)
                     {
                         int newRoom = map[i + 1, j];
+
+                        UpdateRoomsInNumberOfDoors(currentRoom, newRoom);
+
+                        numberOfPossibleDoors[currentRoom][newRoom]++;
+                        numberOfPossibleDoors[newRoom][currentRoom]++;
                         Node newNode = graph.Search(newRoom.ToString());
                         if (!currentNode.Links.ContainsKey(newNode))
                         {
@@ -786,6 +820,11 @@ public class CreateFloor : MonoBehaviour
                     if (map[i, j + 1] != 0 && map[i, j + 1] != currentRoom)
                     {
                         int newRoom = map[i, j + 1];
+
+                        UpdateRoomsInNumberOfDoors(currentRoom, newRoom);
+
+                        numberOfPossibleDoors[currentRoom][newRoom]++;
+                        numberOfPossibleDoors[newRoom][currentRoom]++;
                         Node newNode = graph.Search(newRoom.ToString());
                         if (!currentNode.Links.ContainsKey(newNode))
                         {
@@ -796,6 +835,8 @@ public class CreateFloor : MonoBehaviour
                 }
             }
         }
+
+        GetNumberOfActualDoors();
         dataLongestShotWay = floid.floid(graph);
 
         foreach (var qwe in graph)
@@ -805,6 +846,20 @@ public class CreateFloor : MonoBehaviour
             foreach (var qwe2 in qwe1)
             {
                 Debug.Log($"{qwe2.Key.Name} - {qwe2.Value}");
+            }
+        }
+        foreach (var qwe in numberOfPossibleDoors)
+        {
+            foreach (var qwe2 in qwe.Value)
+            {
+                Debug.Log($"Коилчество возможных дверей: {qwe.Key} - {qwe2.Key} - {qwe2.Value}");
+            }
+        }
+        foreach (var qwe in numberOfActualDoors)
+        {
+            foreach (var qwe2 in qwe.Value)
+            {
+                Debug.Log($"Коилчество актуальных дверей: {qwe.Key} - {qwe2.Key} - {qwe2.Value}");
             }
         }
         Debug.Log($"{dataLongestShotWay.Item1} {dataLongestShotWay.Item2} {dataLongestShotWay.Item3}");
@@ -886,5 +941,38 @@ public class CreateFloor : MonoBehaviour
 
         }
         */
+    }
+
+    private void UpdateRoomsInNumberOfDoors(int currentRoom, int newRoom)
+    {
+        if (!coordsOfPossibleDoors.ContainsKey(currentRoom))
+            coordsOfPossibleDoors.Add(currentRoom, new List<(int, int, int, int, bool)[]>());
+        if (!numberOfPossibleDoors.ContainsKey(currentRoom))
+            numberOfPossibleDoors.Add(currentRoom, new Dictionary<int, int>());
+        if (!numberOfPossibleDoors.ContainsKey(newRoom))
+            numberOfPossibleDoors.Add(newRoom, new Dictionary<int, int>());
+        if (!numberOfPossibleDoors[currentRoom].ContainsKey(newRoom))
+            numberOfPossibleDoors[currentRoom].Add(newRoom, 0);
+        if (!numberOfPossibleDoors[newRoom].ContainsKey(currentRoom))
+            numberOfPossibleDoors[newRoom].Add(currentRoom, 0);
+    }
+
+    private void GetNumberOfActualDoors()
+    {
+        foreach (var qwe in numberOfPossibleDoors)
+        {
+            if (!numberOfActualDoors.ContainsKey(qwe.Key))
+                numberOfActualDoors.Add(qwe.Key, new Dictionary<int, int>());
+            foreach (var qwe2 in qwe.Value)
+            {
+                if (numberOfActualDoors.ContainsKey(qwe2.Key))
+                    continue;
+
+                numberOfActualDoors.Add(qwe2.Key, new Dictionary<int, int>());
+                int randNumber = Random.Range(1, qwe2.Value+1);
+                numberOfActualDoors[qwe.Key].Add(qwe2.Key, randNumber);
+                numberOfActualDoors[qwe2.Key].Add(qwe.Key, randNumber);
+            }
+        }
     }
 }

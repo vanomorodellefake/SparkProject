@@ -15,7 +15,7 @@ MonoBehaviour:
   typeOfRoomInfs:
   - name: 1room
     Value:
-      floorsOfRoom: {fileID: 11400000, guid: 5bce08bbd477a244fb5fae383bac95ca, type: 2}
+      floorsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
       wallsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
       contentOfRoom:
       - name: empty
@@ -39,3 +39,21 @@ MonoBehaviour:
     weight: 5
     max_amount: 0
     min_amount: 0
+  startRoom:
+    floorsOfRoom: {fileID: 11400000, guid: ee208a28527f9de4fae07178a33bbe42, type: 2}
+    wallsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
+    contentOfRoom:
+    - name: Empty
+      Value: {fileID: 11400000, guid: 555487fb5e74d3b4f82d86daeff35a71, type: 2}
+      weight: 5
+      max_amount: 0
+      min_amount: 0
+  endRoom:
+    floorsOfRoom: {fileID: 11400000, guid: 5bce08bbd477a244fb5fae383bac95ca, type: 2}
+    wallsOfRoom: {fileID: 11400000, guid: c66d167f719da864293846893d139573, type: 2}
+    contentOfRoom:
+    - name: Empty
+      Value: {fileID: 11400000, guid: 555487fb5e74d3b4f82d86daeff35a71, type: 2}
+      weight: 5
+      max_amount: 0
+      min_amount: 0

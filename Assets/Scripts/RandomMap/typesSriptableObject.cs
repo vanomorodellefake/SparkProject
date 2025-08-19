@@ -3,6 +3,8 @@ using UnityEngine;
 public class TypesOfRoom : ScriptableObject
 {
     public ItemOfMassive<TypeOfRoom>[] typeOfRoomInfs;
+    public TypeOfRoom startRoom;
+    public TypeOfRoom endRoom;
 }
 [System.Serializable]
 public class TypeOfRoom
