@@ -21,6 +21,7 @@ public class CreateFloor : MonoBehaviour
     private Dictionary<int, Dictionary<int, int>> numberOfPossibleDoors = new();
     private Dictionary<int, Dictionary<int, int>> numberOfActualDoors = new();
     private Dictionary<int, List<(int, int, int, int, bool)[]>> coordsOfPossibleDoors = new();
+    private List<int[]> alreadyCreatedDoors = new();
 
     private void Start()
     {
@@ -719,6 +720,11 @@ public class CreateFloor : MonoBehaviour
             for (int j = 0; j < rows; j++)
             {
                 int currentRoom = metrs[j, i];
+                int[] currentCoords = new int[2] { j, i };
+                int newRoom = 0;
+                int[] newCoords;
+
+                Debug.LogError($"Êîîðäû: {i}, {j}");
 
                 // Ãåíåðàöèÿ ñòåí âîêðóã
                 /*
@@ -742,14 +748,95 @@ public class CreateFloor : MonoBehaviour
                 // Ãåíåðàöèÿ ñòåí ìåæäó êîìíàò
                 if (currentRoom != 0)
                 {
+                    
+                    newCoords = new int[2] { j, i + 1 };
                     if ( ( i < x - 1 && metrs[j, i + 1] == 0 ) || i == x - 1)
                     {
                         Instantiate(wall, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
                     }
                     else if (metrs[j, i + 1] != currentRoom)
                     {
-                        Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                        newRoom = metrs[j, i + 1];
+                        if (CheckCreatedDoors(currentCoords, newCoords))
+                        {
+                            Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                        }
+                        else if (numberOfActualDoors[currentRoom][newRoom] == numberOfPossibleDoors[currentRoom][newRoom])
+                        {
+                            alreadyCreatedDoors.Add(new int[4] { currentCoords[0], currentCoords[1], newCoords[0], newCoords[1] });
+                            Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+
+                            DownNumbersOfAllDoors(currentRoom, newRoom);
+                        }
+                        else if (numberOfActualDoors[currentRoom][newRoom] == 0)
+                        {
+                            Instantiate(wall, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                        }
+                        else
+                        {
+                            int checks = Random.Range(0,2);
+                            if (checks == 0)
+                            {
+                                alreadyCreatedDoors.Add(new int[4] { currentCoords[0], currentCoords[1], newCoords[0], newCoords[1] });
+                                Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                                DownNumbersOfAllDoors(currentRoom, newRoom);
+                            }
+                            else if (checks == 1)
+                            {
+                                Instantiate(wall, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                                DownNumbersOfPossibleDoors(currentRoom, newRoom);
+                            }
+                            else
+                                Debug.LogError("ÏÐÎÁËÅÌÊÀ, ÂÛÏÀËÀ ÄÂÎÉÊÀ!");
+                        }
+                        //    Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
                     }
+
+                    //newRoom = metrs[j, i - 1];
+
+                    newCoords = new int[2] { j, i - 1 };
+                    if ((i > 0 && metrs[j, i - 1] == 0) || i == 0)
+                    {
+                        Instantiate(wall, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                    }
+                    else if (metrs[j, i - 1] != currentRoom)
+                    {
+                        newRoom = metrs[j, i - 1];
+                        if (CheckCreatedDoors(currentCoords, newCoords))
+                        {
+                            Instantiate(wallWithHole, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                        }
+                        else if (numberOfActualDoors[currentRoom][newRoom] == numberOfPossibleDoors[currentRoom][newRoom])
+                        {
+                            alreadyCreatedDoors.Add(new int[4] { currentCoords[0], currentCoords[1], newCoords[0], newCoords[1] });
+                            Instantiate(wallWithHole, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+
+                            DownNumbersOfAllDoors(currentRoom, newRoom);
+                        }
+                        else if (numberOfActualDoors[currentRoom][newRoom] == 0)
+                        {
+                            Instantiate(wall, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                        }
+                        else
+                        {
+                            int checks = Random.Range(0, 2);
+                            if (checks == 0)
+                            {
+                                alreadyCreatedDoors.Add(new int[4] { currentCoords[0], currentCoords[1], newCoords[0], newCoords[1] });
+                                Instantiate(wallWithHole, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                                DownNumbersOfAllDoors(currentRoom, newRoom);
+                            }
+                            else if (checks == 1)
+                            {
+                                Instantiate(wall, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                                DownNumbersOfPossibleDoors(currentRoom, newRoom);
+                            }
+                            else
+                                Debug.LogError("ÏÐÎÁËÅÌÊÀ, ÂÛÏÀËÀ ÄÂÎÉÊÀ!");
+                        }
+                        //    Instantiate(wallWithHole, new Vector3(i * 5 + 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
+                    }
+                    /*
                     if ((i > 0 && metrs[j, i - 1] == 0) || i == 0)
                     {
                         Instantiate(wall, new Vector3(i * 5 - 2.25f, 2.75f, j * 5), Quaternion.identity, transform);
@@ -758,6 +845,8 @@ public class CreateFloor : MonoBehaviour
                     {
                         Instantiate(wallWithHole, new Vector3(i * 5 - 2.25f, 2.55f, j * 5), Quaternion.identity, transform);
                     }
+                    */
+                    //newRoom = metrs[j + 1, i];
                     if (j < y - 1 && metrs[j + 1, i] == 0 || j == y - 1)
                     {
                         Instantiate(wall, new Vector3(i*5, 2.75f, j*5 + 2.25f), Quaternion.Euler(0, 90, 0), transform);
@@ -766,6 +855,8 @@ public class CreateFloor : MonoBehaviour
                     {
                         Instantiate(wallWithHole, new Vector3(i * 5, 2.75f, j * 5 + 2.25f), Quaternion.Euler(0, 90, 0), transform);
                     }
+
+                    //newRoom = metrs[j - 1, i];
                     if (j > 0 && metrs[j - 1, i] == 0 || j == 0)
                     {
                         Instantiate(wall, new Vector3(i * 5, 2.75f, j * 5 - 2.25f), Quaternion.Euler(0, 90, 0), transform);
@@ -779,7 +870,26 @@ public class CreateFloor : MonoBehaviour
             }
         }
     }
-
+    private bool CheckCreatedDoors(int[] currentCoords, int[] newCoords)
+    {
+        if (alreadyCreatedDoors.Contains(new int[4] { newCoords[0], newCoords[1], currentCoords[0], currentCoords[1] }))
+            return true;
+        return false;
+    }
+    private void DownNumbersOfAllDoors(int currentRoom, int newRoom)
+    {
+        Debug.LogWarning($"AllDoors: {currentRoom} {newRoom}");
+        numberOfActualDoors[currentRoom][newRoom]--;
+        numberOfActualDoors[newRoom][currentRoom]--;
+        numberOfPossibleDoors[currentRoom][newRoom]--;
+        numberOfPossibleDoors[newRoom][currentRoom]--;
+    }
+    private void DownNumbersOfPossibleDoors(int currentRoom, int newRoom)
+    {
+        Debug.LogWarning($"PossibleDoors: {currentRoom} {newRoom}");
+        numberOfPossibleDoors[currentRoom][newRoom]--;
+        numberOfPossibleDoors[newRoom][currentRoom]--;
+    }
     public void GenerateOfPaths(int[,] map, int amountOfRooms)
     {
         Floid floid = new Floid();
@@ -965,11 +1075,19 @@ public class CreateFloor : MonoBehaviour
                 numberOfActualDoors.Add(qwe.Key, new Dictionary<int, int>());
             foreach (var qwe2 in qwe.Value)
             {
-                if (numberOfActualDoors.ContainsKey(qwe2.Key))
+                if (!numberOfActualDoors.ContainsKey(qwe2.Key))
+                {
+                    numberOfActualDoors.Add(qwe2.Key, new Dictionary<int, int>());
+                }
+                if (numberOfActualDoors[qwe.Key].ContainsKey(qwe2.Key))
+                    continue;
+                if (numberOfActualDoors[qwe2.Key].ContainsKey(qwe.Key))
                     continue;
 
-                numberOfActualDoors.Add(qwe2.Key, new Dictionary<int, int>());
+                //numberOfActualDoors.Add(qwe2.Key, new Dictionary<int, int>());
+
                 int randNumber = Random.Range(1, qwe2.Value+1);
+
                 numberOfActualDoors[qwe.Key].Add(qwe2.Key, randNumber);
                 numberOfActualDoors[qwe2.Key].Add(qwe.Key, randNumber);
             }
